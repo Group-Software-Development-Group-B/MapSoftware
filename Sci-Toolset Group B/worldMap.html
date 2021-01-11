@@ -5,16 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
-      integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
-      crossorigin="">
-
-      <script
-      src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
-      integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
-      crossorigin=""
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+    integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+    crossorigin=""
+    />
+    <script
+    src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+    integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+    crossorigin=""
     ></script>
+    <script src="worldMap.js"></script>
 
     <style>
       #mymap 
@@ -25,17 +26,15 @@
     <title>Mapping</title>
   </head>
   <body>
-    <h1>Data Mapping Application</h1>  
-    <div id="myMap"></div>
-    <body onload="onLoad()"></body>
+    <h1>Data Mapping Application</h1>
     <p>
       latitude: <span id="latitude"></span>&deg;<br />
       longitude: <span id="longitude"></span>&deg;
     </p>
+    <div id="mymap"></div>
+    
+    <script>
+      document.onload = main();
+    </script>
 
-
-
-
-    <script src="worldMap.js"></script>
   </body>
-</html>

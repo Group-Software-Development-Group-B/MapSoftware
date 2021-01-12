@@ -1,3 +1,6 @@
+/// ALOT OF THIS FILE IS A FORM OF TESTING MAP MANIPULATION.
+/// THIS WILL NO DOUBT HAVE TO ADAPT TO REACT'S IMPLEMENTATION
+
 function main() {
   if ('geolocation' in navigator) 
 {
@@ -17,13 +20,48 @@ function main() {
   const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
   const tiles = L.tileLayer(tileUrl, { attribution });
   tiles.addTo(mymap);
-
+  
+  var allMapLayers = [];
+  
+  var myStyle = { "color": "#222222", "weight": 1, "opacity": 0.9 };
   mymap.on('click', function(e)
   {
+    clickCount ++;
+
     console.log(e);
     console.log(e.latlng);
     var mouseCoords = e.latlng;
 
+    var sampleJSON = getSampleGeoJSON(clickCount);
+    switch (clickCount){
+      case 1:
+        myStyle = { "color": "#222222", "weight": 1, "opacity": 0.9 };
+        break;
+      case 2:
+        myStyle = { "color": "#FF0000", "weight": 1, "opacity": 0.9 };
+        break;
+      case 3:
+        myStyle = { "color": "#FF0000", "weight": 1, "opacity": 0.9 };
+        break;
+      case 4:
+        myStyle = { "color": "#0000ff", "weight": 1, "opacity": 0.9 };
+        break;
+      case 5:
+         for(i = 0; i < allMapLayers.length; i++) { mymap.removeLayer(allMapLayers[i]); }
+        allMapLayers.length = 0;
+        break;
+      default:
+        break;
+    }
+    var jsonLayer;
+    if(sampleJSON != null)
+    {
+      jsonLayer = L.geoJSON(sampleJSON, {style: myStyle}).addTo(mymap);
+      allMapLayers.push(jsonLayer);
+      console.log("Current number of layers" + allMapLayers.length)
+      //mymap.fitBounds(jsonLayer.getBounds());
+    }
+    if(clickCount == 5) clickCount = 0;
     // Drops a pin at the clicked location
     // var newMarker = L.marker([mouseCoords.lat, mouseCoords.lng]).addTo(this);
     
@@ -36,10 +74,6 @@ function main() {
     //imageBounds = [e.latlng, [e.latlng.lat+0.005, e.latlng.lng+0.005]];
     //L.imageOverlay(imageUrl, imageBounds).addTo(this);
 
-    var sampleJSON = getSampleGeoJSONArray(); //remove this line if you dont need to use the sample geoJSON array.
-    var jsonLayer = L.geoJSON(sampleJSON)      
-    jsonLayer.addTo(mymap);
-    mymap.fitBounds(jsonLayer.getBounds());
   })
 });
 } 
@@ -57,11 +91,11 @@ function getSampleGeoJSONArray()
     "geometry": {
       "type": "Polygon",
       "coordinates": 
-        [[ [-5.000, 50.000], [-4.000, 50.000], [-4.000, 51.000], [-5.000, 51.000] ]]
-        
+        [[ [-5.000, 50.000], [-4.000, 50.000], [-4.000, 51.000], [-5.000, 51.000] ]]     
     },
     "properties": {
-      "name": "Big Square, Fam"
+      "name": "Big Square, Fam",
+      "popupContent": "This is where the Rockies play!"
     }
   };
   var geojson2 = 
@@ -92,7 +126,7 @@ function getSampleGeoJSONArray()
     "geometry": {
       "type": "MultiPolygon",
       "coordinates":
-      [[[[0.1278,51.5074], [0.1280,51.5074], [0.1280,51.5080], [0.1278,51.5080]]],
+      [[[[0.1278,51.5074], [1.000, 51.5074], [1.000, 52.000]]],
       [[[0.1178,51.5000], [0.1180,51.5000], [0.1180,51.5020]]]]
     },
     "properties": {
@@ -102,4 +136,64 @@ function getSampleGeoJSONArray()
 
   var geojsons = [geojson1, geojson2, geojson3, geojson4];
  return geojsons;
+}
+
+function getSampleGeoJSON(number)
+{
+  var geojson1 = 
+  {
+    "type": "Feature",
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": 
+        [[ [-5.000, 50.000], [-4.000, 50.000], [-4.000, 51.000], [-5.000, 51.000] ]]     
+    },
+    "properties": {
+      "name": "Big Square, Fam",
+      "popupContent": "This is where the Rockies play!"
+    }
+  };
+  var geojson2 = 
+  {
+    "type": "Feature",
+    "geometry": {
+      "type": "Point",
+      "coordinates": [-5.515, 51.913]
+    },
+    "properties": {
+      "name": "Somewhere int' sea"
+    }
+  };
+  var geojson3 = 
+  {
+    "type": "Feature",
+    "geometry": {
+      "type": "LineString",
+      "coordinates": [[-5.18, 51.958], [-5.50, 51.958], [-5.500, 52.000]]
+    },
+    "properties": {
+      "name": "Line of truth"
+    }
+  };
+  var geojson4 = 
+  {
+    "type": "Feature",
+    "geometry": {
+      "type": "MultiPolygon",
+      "coordinates":
+      [[[[0.1278,51.5074], [1.000, 51.5074], [1.000, 52.000]]],
+      [[[0.1178,51.5000], [0.1180,51.5000], [0.1180,51.5020]]]]
+    },
+    "properties": {
+      "name": "MultiPolywannacracker"
+    }
+  };
+
+  var geojsons = [geojson1, geojson2, geojson3, geojson4];
+  var arraySize = geojsons.length;
+  if(number <= (arraySize))
+  {
+    return geojsons[number-1];
+  }
+  else return null;
 }

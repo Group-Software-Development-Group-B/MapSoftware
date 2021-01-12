@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="worldMap.css">
     <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
@@ -32,7 +33,8 @@
       longitude: <span id="longitude"></span>&deg;
     </p>
     <div id="mymap"></div>
-    
+    <button onclick="OnRemoveClick()" class="button">Click Here to Remove All Displayed Polygons / Points / LineStrings</button>
+  
     <script>
       document.onload = main();
     </script>

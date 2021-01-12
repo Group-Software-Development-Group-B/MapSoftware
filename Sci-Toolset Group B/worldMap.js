@@ -36,10 +36,10 @@ function main() {
     //imageBounds = [e.latlng, [e.latlng.lat+0.005, e.latlng.lng+0.005]];
     //L.imageOverlay(imageUrl, imageBounds).addTo(this);
 
-    var sampleJSON = getSampleGeoJSONArray();
-    var jsonLayer = L.geoJSON(sampleJSON)
-    
+    var sampleJSON = getSampleGeoJSONArray(); //remove this line if you dont need to use the sample geoJSON array.
+    var jsonLayer = L.geoJSON(sampleJSON)      
     jsonLayer.addTo(mymap);
+    mymap.fitBounds(jsonLayer.getBounds());
   })
 });
 } 
@@ -48,6 +48,7 @@ else
   console.log('Geolocation not available');
 } }
 
+// DO NOT DELETE, USE FOR REFERENCE!
 function getSampleGeoJSONArray()
 {
   var geojson1 = 
@@ -55,13 +56,12 @@ function getSampleGeoJSONArray()
     "type": "Feature",
     "geometry": {
       "type": "Polygon",
-      "coordinates": [
-        [ [100.0, 0.0], [101.0, 0.0], [101.0, 1.0],
-          [100.0, 1.0], [100.0, 0.0] ]
-        ]
+      "coordinates": 
+        [[ [-5.000, 50.000], [-4.000, 50.000], [-4.000, 51.000], [-5.000, 51.000] ]]
+        
     },
     "properties": {
-      "name": "Dinagat Islands"
+      "name": "Big Square, Fam"
     }
   };
   var geojson2 = 
@@ -72,29 +72,31 @@ function getSampleGeoJSONArray()
       "coordinates": [-5.515, 51.913]
     },
     "properties": {
-      "name": "Dinagat Islands"
+      "name": "Somewhere int' sea"
     }
   };
   var geojson3 = 
   {
     "type": "Feature",
     "geometry": {
-      "type": "Point",
-      "coordinates": [-5.18, 51.958]
+      "type": "LineString",
+      "coordinates": [[-5.18, 51.958],[-5.50, 51.958],[-5.500, 52.000]]
     },
     "properties": {
-      "name": "Dinagat Islands"
+      "name": "Line of truth"
     }
   };
   var geojson4 = 
   {
     "type": "Feature",
     "geometry": {
-      "type": "Point",
-      "coordinates": [-5.511, 51.058]
+      "type": "MultiPolygon",
+      "coordinates":
+      [[[[0.1278,51.5074], [0.1280,51.5074], [0.1280,51.5080], [0.1278,51.5080]]],
+      [[[0.1178,51.5000], [0.1180,51.5000], [0.1180,51.5020]]]]
     },
     "properties": {
-      "name": "Dinagat Islands"
+      "name": "MultiPolywannacracker"
     }
   };
 

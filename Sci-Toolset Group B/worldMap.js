@@ -207,7 +207,6 @@ function returnCoordsFromFlight()
 
   // Mission > FlightPaths = MultiplePolygon
 
-
   let geojson1 = 
   {
     "type": "Feature",

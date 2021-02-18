@@ -2,32 +2,38 @@ function OnLoad()
 {
     console.log("I have loaded!");
 
-          const mymap = L.map('mymap').setView([55.65, -6.145], 15);        
+          const mymap = L.map('mymap').setView([55.65, -6.145], 15);    
+          const maxZoom = 10;
+          mapPolygons = [];
+
+          mymap.on('click', function(e) {        
+              ClearMap(mymap);
+          });
 
            const defaultMap = L.tileLayer (
               'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-                maxZoom: 7
+                maxZoom 
               });
           
           
            const secondaryMap = L.tileLayer (
           'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-            maxZoom: 7
+            maxZoom 
           });
           
           const openstreetmapHot = L.tileLayer(
             'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
-            maxZoom: 7
+            maxZoom 
           })
           
           // Tile type: openstreetmap Osm
           const openstreetmapOsm = L.tileLayer(
             'http://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
-            maxZoom: 7
+            maxZoom 
           })
           
 
@@ -40,66 +46,80 @@ function OnLoad()
 
           openstreetmapHot.addTo(mymap);
           L.control.layers(allOptions).addTo(mymap);
-          
-          var array= [];
+        
 
-          getIDs().then(response=> {
-            
-          })
+          getIDs().then(response=> 
+          {
+            var numberofIDs = response.missions.length;
+            console.log(numberofIDs)
+            for(i = 0; i < numberofIDs; i++)
+            {
+              CurrentID = response.missions[i].id;
+              callDataInOrder(CurrentID).then(response => 
+              {
+                if(response.type === "Polygon")
+                {
+                  plotPolygons(mymap, response.coordinates);
+                } 
+                else if (response.type === "MultiPolygon")
+                {
+                    plotMultiPolygon(mymap, response.coordinates);
+                }
 
-          callDataInOrder().then(response => {
-            plotPolygons(mymap, response.coordinates);
-            
-            // further stuff here
-
-
-        }) //.then ends here
+              })
+            }
+          }) //.then ends here
 };
 
-// Pass in the map, and an array of polygons
-function plotPolygons(mymap, allCoords)
+function plotMultiPolygon(mymap, response)
 {
-  console.log("number of polygons:" + allCoords.length);
-  var originalPolygons = [];
-  var swappedPolygons = []; 
-  // make an array of polygons
-  for (let i = 0; i < allCoords.length; i++)
+  console.log("Plotting MultiPolygon")
+  var allCoords = response;
+  for(let i = 0; i < allCoords.length; i++)
   {
-    originalPolygons.push(allCoords[i]);    
+    plotPolygons(mymap, allCoords[i]);
   }
-  console.log(originalPolygons[0])
-  //loop through all polygons, convert each point and push them to a new array
-  for (let i = 0; i < originalPolygons.length; i++)
-  {
-    let convertedPoints = [];
-    for (let j = 0; j < originalPolygons[i].length; j++)
-    {
-      convertedPoints.push(SwapLatLng(originalPolygons[i][j]));	
-    }
-
-  swappedPolygons.push(convertedPoints);
-  var flightPolygon = L.polygon(swappedPolygons[i], {color: 'red'}).addTo(mymap);
-  flightPolygon.bindPopup("<h1>Hello!</h1><p>" + "<h2>The first points in this Polygon are: </h2><b>" + swappedPolygons[0][0][0] + "<br>" + swappedPolygons[0][0][1] + "</b></br>" +
-  "<br><b> The second points are: <br>" + swappedPolygons[0][1][0] + "<br>" + swappedPolygons[0][1][1] + "</br></b>"
-    );
-  }
-  // console.log(originalPolygons[0]);
-  // console.log(swappedPolygons[0]);
 }
 
+// Pass in the map, and an array of polygons
+function plotPolygons(mymap, response)
+{
+  console.log("Plotting Polygon")
+  var allCoords = response;
 
+    var originalPolygons = [];
+    var swappedPolygons = []; 
 
-
-
-
-
-
+    // make an array of polygons
+    for (let i = 0; i < allCoords.length; i++)
+    {
+      originalPolygons.push(allCoords[i]);    
+      console.log(allCoords[i]);
+    }
+  
+    for (let i = 0; i < originalPolygons.length; i++)
+    {
+      let convertedPoints = [];
+      for (let j = 0; j < originalPolygons[i].length; j++)
+      {
+        convertedPoints.push(SwapLatLng(originalPolygons[i][j]));	
+      }
+    swappedPolygons.push(convertedPoints);
+    var flightPolygon = L.polygon(swappedPolygons[i], {color: 'red'}).addTo(mymap);
+    flightPolygon.bindPopup("Wagwan G, I'm a polywagwan");
+    mapPolygons.push(flightPolygon);
+    }
+}
 
 function SwapLatLng(latlng)
 {
   return [latlng[1], latlng[0]]
 }
 
+function ClearMap(mymap)
+{
+  mapPolygons.forEach(element =>  mymap.removeLayer(element));
+}
 
     console.log("index.html 7 | Get Flight Data");
     var urlencoded = new URLSearchParams();
@@ -137,7 +157,7 @@ function SwapLatLng(latlng)
 
     const getCoordinates = async (token, IDs) => {
       console.log("index.html 10 | Processing...");
-        const request = await fetch('https://hallam.sci-toolset.com/discover/api/v1/missionfeed/missions/'+IDs.missions[0].id+'/footprint',{  method: 'get', 
+        const request = await fetch('https://hallam.sci-toolset.com/discover/api/v1/missionfeed/missions/'+IDs+'/footprint',{  method: 'get', 
         headers: { 
           'Content-Type': 'application/json',
           'Accept': '*/*',
@@ -148,15 +168,16 @@ function SwapLatLng(latlng)
         return missionCoordinate;
      }
      
-    const callDataInOrder = async () => {
+    const callDataInOrder = async CurrentID => {
+      
       const data = await getAccess();
       const IDs = await getMissions(data);
         
 
-        const missionCoordinates = await getCoordinates(data, IDs);
+        const missionCoordinates = await getCoordinates(data, CurrentID);
         console.log('index.html 31 | detail Data', missionCoordinates);
         return missionCoordinates;
-
+    }
     const getIDs = async() => {
       const data = await getAccess();
       const IDs = await getMissions(data);
@@ -164,118 +185,3 @@ function SwapLatLng(latlng)
       return IDs;
 
      }
-             
-}
-
-
-
-/* var geojsonFeature = {
-            "type": "Feature",
-            "properties": {
-                "name": {ID},
-                "amenity": "Baseball Stadium",
-                "popupContent": "This is where the Rockies play!"
-            },
-            "geometry": {
-                "type": "Point",
-                "coordinates": {data}
-            }
-        }; */
-      
-
-
-
-      // Stuff i found that might be useful
-      //
-      //
-      //    async getAccessToken() {
-      //    let d = await fetch('https://hallam.sci-toolset.com/api/v1/token/', {
-      //      method: 'POST',
-      //     body: 'grant_type=password&username=hallam-a&password=z[97V<WM',
-      //      headers: {
-      //          'Accept': '*/*',
-      //          'Authorization': 'Basic ' + btoa(this.id + ":" + this.secret),
-      //          'Content-Type': 'application/x-www-form-urlencoded'
-      //      },
-      //  })
-      //
-      //  if (d.ok) {
-      //      return await d.json();
-      //  }
-      //
-      //
-      // ------------------------------------------------------
-      //                  getting specific products from api
-      //
-      //
-      //      let products = [];
-      //      Get the list of product IDs.
-      //      let productIDs = await fetch('https://hallam.sci-toolset.com/discover/api/v1/products/search', {
-      //          method: 'POST',
-      //          body: `{ "size":${amt}, "keywords":"" }`,
-      //          headers: {
-      //              'Accept': '*/*',
-      //               'Authorization': 'Bearer ' + this.accessToken,
-      //               'Content-Type': 'application/json'
-      //          }
-      //      })  
-      //      let productIDs = await fetch('https://hallam.sci-toolset.com/discover/api/v1/products/search', {
-      //          method: 'POST',
-      //          body: `{"size":${amt}, "keywords":""}`,
-      //          headers: {
-      //              'Accept': '*/*',
-      //              'Authorization': 'Bearer ' + this.accessToken,
-      //              'Content-Type': 'application/json'
-      //          }
-      //       })
-      //
-      //       if (productIDs.ok) {
-      //           productIDs = await productIDs.json();
-      //           for (let p of productIDs.results.searchresults) 
-      //           {
-      //               let productData = await fetch("https://hallam.sci-toolset.com/discover/api/v1/products/" + p.id, {
-      //               headers: {
-      //                   Authorization: 'Bearer ' + this.accessToken,
-      //               },
-      //           })
-      //           products.push(await productData.json());
-      //         }
-      //     }
-      //     return products;
-      // }
-      //
-      // ---------------------------------------------------------------------------
-      //                  on mouse click example
-      //
-      //    newMarker.on("click", (e) => {
-      //        const id = e.target._leaflet_id;
-      //        for (let h = 0; h < iconsLayer.length; h++) {
-      //            if (id == iconsLayer[h]._leaflet_id) {
-      //                var y = iconsLayer[h]._latlng.lat;
-      //                var x = iconsLayer[h]._latlng.lng;
-      //                mymap.flyTo([y, x], 10.3, { duration: 4 });
-      //            }
-      //        }
-      //    })
-      //
-      // -----------------------------------------------------------------------------
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-      //
-      //       
-      // 
-      //                         
-      // 
-      //     
-      // 
-      //     
-      // 

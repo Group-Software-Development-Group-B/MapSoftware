@@ -1,0 +1,84 @@
+<html>
+  <div id="container">
+    <h3>Total Covid Cases</h3>
+    <h2 id="total-cases"></h2>
+
+    <h3>Total Cases in Hubei (City of Origin)</h3>
+    <h2 id="city-of-origin"></h2>
+  </div>
+
+  <script>
+
+
+    console.log("index.html 7 | Get Covid Data");
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("grant_type", "password");
+    urlencoded.append("username", "hallam-c");
+    urlencoded.append("password", "6&m_gHw5");
+
+    const getAccess = async () => {
+      console.log("index.html 10 | Processing...");
+      const request = await fetch('https://hallam.sci-toolset.com/api/v1/token',{  method: 'post', 
+      headers: { 
+        'Content-Type': 'application/x-www-form-urlencoded', 
+        'Accept': '*/*', 
+        'Host': 'hallam.sci-toolset.com', 
+        'Authorization': 'Basic YjIxNjZlODAtYjczMi00NDA4LTkyZjEtYzUzYTUyM2YyMTIzOjc5YzAwNjMwNDY1Mzk3MTNlMWFkOTljM2EyYWIyNGUyZmQ3ODdiZDM3YWRjYTU4MWUxMWNiYzk1MWZkYWM1ODM='
+  },
+  body: urlencoded
+  },);
+      const data = await request.json();
+      return data;
+    };
+
+      const getMissions = async token => {
+        console.log("index.html 10 | Processing...");
+        const request = await fetch('https://hallam.sci-toolset.com/discover/api/v1/missionfeed/missions',{  method: 'get', 
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': '*/*',
+         'Host': 'hallam.sci-toolset.com',
+          'Authorization': 'Bearer ' + token.access_token},
+    },);
+        const missions = await request.json();
+        return missions;
+     }
+
+    const getCoordinates = async (token, IDs) => {
+      console.log("index.html 10 | Processing...");
+        const request = await fetch('https://hallam.sci-toolset.com/discover/api/v1/missionfeed/missions/'+IDs.missions[0].id+'/footprint',{  method: 'get', 
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': '*/*',
+         'Host': 'hallam.sci-toolset.com',
+          'Authorization': 'Bearer ' + token.access_token},
+    },);
+        const missionCoordinate = await request.json();
+        return missionCoordinate;
+     }
+
+    
+
+
+    const callDataInOrder = async () => {
+      const data = await getAccess();
+      console.log('index.html 27 | covid Data', data);
+      document.getElementById("total-cases").innerText = data.access_token;
+
+
+        const IDs = await getMissions(data);
+        console.log('index.html 31 | detail Data', IDs);
+        //document.getElementById("city-of-origin").innerText = IDs.missions;
+
+        const missionCoordinates = await getCoordinates(data, IDs);
+        console.log('index.html 31 | detail Data', IDs);
+        document.getElementById("city-of-origin").innerText = missionCoordinates.coordinates;
+        
+
+      }
+    
+
+    callDataInOrder();
+
+  </script>
+</html>
